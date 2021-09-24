@@ -63,6 +63,68 @@ func TestIndirectToValue(t *testing.T) {
 	}
 }
 
+func TestIndirectToSetableValue(t *testing.T) {
+	type testStruct struct {
+		V *int
+	}
+
+	type testCase struct {
+		desp   string
+		v      interface{}
+		err    string
+		expect interface{}
+	}
+	testCases := []testCase{
+		{
+			desp: "normal value",
+			v: func() interface{} {
+				var i int = 0
+				return &i
+			}(),
+			expect: func() interface{} {
+				var i int = 0
+				return i
+			}(),
+		},
+		{
+			desp: "nil pointer",
+			v: func() interface{} {
+				st := &testStruct{}
+				return reflect.ValueOf(st).Elem().Field(0)
+			}(),
+			expect: func() interface{} {
+				var i int = 0
+				return i
+			}(),
+		},
+		{
+			desp: "cannot set",
+			v:    int(0),
+			err:  "cannot been set, it must setable",
+		},
+		{
+			desp: "cannot set pointer",
+			v:    (*int)(nil),
+			err:  "cannot been set, it must setable",
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.desp, func(t *testing.T) {
+			g := NewWithT(t)
+			actual, err := IndirectToSetableValue(tc.v)
+			if tc.err != "" {
+				g.Expect(err).To(HaveOccurred())
+				g.Expect(err.Error()).To(MatchRegexp(tc.err))
+				return
+			}
+
+			g.Expect(err).ToNot(HaveOccurred())
+			g.Expect(actual.Interface()).To(Equal(tc.expect))
+		})
+	}
+}
+
 func TestNewValue(t *testing.T) {
 	type testCase struct {
 		desp   string

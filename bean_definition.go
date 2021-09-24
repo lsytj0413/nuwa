@@ -41,10 +41,19 @@ type FieldDescriptor struct {
 	// Property is the field property descriptor.
 	// The field should be marked as value=${name}
 	Property *PropertyFieldDescriptor
+
+	// Bean is the field bean descriptor.
+	// The field should be marked as autowire=${name}
+	Bean *BeanFieldDescriptor
 }
 
 // PropertyFieldDescriptor is the descriptor for property autowired value.
 type PropertyFieldDescriptor struct {
+	Name string
+}
+
+// BeanFieldDescriptor is the descriptor for bean autowired value.
+type BeanFieldDescriptor struct {
 	Name string
 }
 

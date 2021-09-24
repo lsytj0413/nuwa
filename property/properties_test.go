@@ -649,4 +649,14 @@ func TestReflect(t *testing.T) {
 		Kind:   0,
 	}))
 	g.Expect(*st.V).To(Equal(1))
+
+	type testCase2 struct {
+		V interface{}
+	}
+	st2 := &testCase2{}
+	v = reflect.ValueOf(st2).Elem().Field(0)
+	g.Expect(v.CanSet()).To(Equal(true), "Struct field interface CanSet")
+	g.Expect(v.IsNil()).To(Equal(true), "Struct field interface IsNil")
+	v.Set(reflect.ValueOf(int(1)))
+	g.Expect(st2.V).To(Equal(int(1)))
 }
