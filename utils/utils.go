@@ -3,6 +3,8 @@ package utils
 import (
 	"fmt"
 	"reflect"
+
+	"github.com/lsytj0413/nuwa/xerrors"
 )
 
 // IndirectToInterface returns the interface's value
@@ -25,6 +27,23 @@ func IndirectToValue(v interface{}) reflect.Value {
 	}
 
 	return reflect.ValueOf(v)
+}
+
+// IndirectToSetableValue returns the setable reflect.Value of i
+func IndirectToSetableValue(i interface{}) (reflect.Value, error) {
+	v := IndirectToValue(i)
+	if v.Kind() == reflect.Ptr {
+		if v.CanSet() && v.IsNil() {
+			v.Set(reflect.New(v.Type().Elem()))
+		}
+
+		v = v.Elem()
+	}
+
+	if !v.CanSet() {
+		return reflect.Value{}, xerrors.Errorf("The '%T' cannot been set, it must setable", i)
+	}
+	return v, nil
 }
 
 // NewValue return the value of type:

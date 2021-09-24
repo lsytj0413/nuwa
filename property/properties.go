@@ -32,22 +32,9 @@ func (p propertiesImpl) Retrive(key string, i interface{}) error {
 		return err
 	}
 
-	v := utils.IndirectToValue(i)
-
-	if v.Kind() == reflect.Ptr {
-		if v.CanSet() && v.IsNil() {
-			// If the kind is ptr and value is can set
-			// And the pointer is nil value, we must initialize it with zero
-			// To avoid set panic with "call of reflect.Value.Set on zero Value"
-			v.Set(reflect.New(v.Type().Elem()))
-		}
-
-		// Use it's elem for set value
-		v = v.Elem()
-	}
-
-	if !v.CanSet() {
-		return xerrors.Errorf("The '%T' cannot been set, it must setable", i)
+	v, err := utils.IndirectToSetableValue(i)
+	if err != nil {
+		return err
 	}
 
 	switch v.Kind() {
