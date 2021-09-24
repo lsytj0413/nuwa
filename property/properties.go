@@ -6,6 +6,7 @@ import (
 
 	"github.com/spf13/cast"
 
+	"github.com/lsytj0413/nuwa/utils"
 	"github.com/lsytj0413/nuwa/xerrors"
 )
 
@@ -31,17 +32,17 @@ func (p propertiesImpl) Retrive(key string, i interface{}) error {
 		return err
 	}
 
-	var v reflect.Value
-	switch e := i.(type) {
-	case reflect.Value:
-		v = e
-	default:
-		v = reflect.ValueOf(i)
-	}
+	v := utils.IndirectToValue(i)
 
-	// If the kind is ptr, we will set the value to it's elem
-	// Because Ptr is not setable
 	if v.Kind() == reflect.Ptr {
+		if v.CanSet() && v.IsNil() {
+			// If the kind is ptr and value is can set
+			// And the pointer is nil value, we must initialize it with zero
+			// To avoid set panic with "call of reflect.Value.Set on zero Value"
+			v.Set(reflect.New(v.Type().Elem()))
+		}
+
+		// Use it's elem for set value
 		v = v.Elem()
 	}
 

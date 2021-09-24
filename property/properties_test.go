@@ -1,10 +1,13 @@
 package property
 
 import (
+	"reflect"
 	"testing"
 
-	"github.com/lsytj0413/nuwa/xerrors"
 	. "github.com/onsi/gomega"
+
+	"github.com/lsytj0413/nuwa/utils"
+	"github.com/lsytj0413/nuwa/xerrors"
 )
 
 func TestSet(t *testing.T) {
@@ -285,6 +288,9 @@ func TestRetrive(t *testing.T) {
 		i      interface{}
 		err    string
 		expect interface{}
+	}
+	type testStruct struct {
+		V *string
 	}
 	testCases := []testCase{
 		{
@@ -567,6 +573,28 @@ func TestRetrive(t *testing.T) {
 			err:    "The 'int' cannot been set, it must setable",
 			expect: nil,
 		},
+		{
+			desp: "retrive struct ptr value",
+			p: propertiesImpl(map[string]string{
+				"k1": "true",
+				"k2": "2",
+			}),
+			key: "k1",
+			i: func() interface{} {
+				s := &testStruct{}
+				return reflect.ValueOf(s).Elem().Field(0)
+			}(),
+			err: "",
+			expect: func() interface{} {
+				s := &testStruct{
+					V: func() *string {
+						v := "true"
+						return &v
+					}(),
+				}
+				return reflect.ValueOf(s).Elem().Field(0)
+			}(),
+		},
 	}
 	for _, tc := range testCases {
 		t.Run(tc.desp, func(t *testing.T) {
@@ -579,7 +607,46 @@ func TestRetrive(t *testing.T) {
 			}
 
 			g.Expect(err).ToNot(HaveOccurred())
-			g.Expect(tc.i).To(Equal(tc.expect))
+
+			// NOTE: use reflect.Value.Interface() to compare value
+			// Because the reflect.Value is always different even if there value is equal
+			g.Expect(utils.IndirectToInterface(tc.i)).To(Equal(utils.IndirectToInterface(tc.expect)))
 		})
 	}
+}
+
+func TestReflect(t *testing.T) {
+	var p int
+	g := NewWithT(t)
+
+	v := reflect.ValueOf(&p)
+	g.Expect(v.CanSet()).To(Equal(false), "Pointer to int CanSet")
+	g.Expect(v.IsNil()).To(Equal(false), "Pointer to int IsNil")
+
+	v = reflect.ValueOf((*int)(nil))
+	g.Expect(v.CanSet()).To(Equal(false), "Nil pointer to int CanSet")
+	g.Expect(v.IsNil()).To(Equal(true), "Nil pointer to int IsNil")
+
+	type testCase struct {
+		V *int
+	}
+	st := &testCase{}
+	v = reflect.ValueOf(st).Elem().Field(0)
+	g.Expect(v.CanSet()).To(Equal(true), "Struct field pointer CanSet")
+	g.Expect(v.IsNil()).To(Equal(true), "Struct field pointer IsNil")
+	g.Expect(func() {
+		v.Elem().Set(reflect.ValueOf(int(1)))
+	}).To(PanicWith(&reflect.ValueError{
+		Method: "reflect.Value.Set",
+		Kind:   0,
+	}))
+
+	v.Set(reflect.New(v.Type().Elem()))
+	g.Expect(func() {
+		v.Elem().Set(reflect.ValueOf(int(1)))
+	}).ToNot(PanicWith(&reflect.ValueError{
+		Method: "reflect.Value.Set",
+		Kind:   0,
+	}))
+	g.Expect(*st.V).To(Equal(1))
 }

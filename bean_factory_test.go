@@ -98,29 +98,3 @@ func TestGetBean(t *testing.T) {
 		})
 	}
 }
-
-func TestGetBeanWithProperty(t *testing.T) {
-	g := NewWithT(t)
-	f := NewBeanFactory()
-
-	f.RegisterBeanDefinition("bean2", &beanDefinitionImpl{
-		Typ: reflect.TypeOf((*Bean2)(nil)),
-		fieldDescriptors: []FieldDescriptor{
-			{
-				FieldIndex: 0,
-				Name:       "V",
-				Typ:        reflect.TypeOf(int(0)),
-				Property: &PropertyFieldDescriptor{
-					Name: "val",
-				},
-			},
-		},
-	})
-	f.Set("val", 1)
-
-	actual, err := f.GetBean("bean2")
-	g.Expect(err).ToNot(HaveOccurred())
-	g.Expect(actual).To(Equal(&Bean2{
-		V: 1,
-	}))
-}

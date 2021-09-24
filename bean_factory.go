@@ -55,11 +55,11 @@ func (f *beanFactoryImpl) GetBean(name string) (interface{}, error) {
 
 				// If the field is ptr, first set it to the ptr to zero value
 				// Otherwise it will be cannot setable
-				// TODO: change this to Property.Retrive function
-				if fv.Kind() == reflect.Ptr {
-					fv.Set(reflect.New(v.Elem().Type().Field(fd.FieldIndex).Type.Elem()))
-					fv = fv.Elem()
-				}
+				// NOTE: the property will take care of this
+				// if fv.Kind() == reflect.Ptr {
+				// 	fv.Set(reflect.New(v.Elem().Type().Field(fd.FieldIndex).Type.Elem()))
+				// 	fv = fv.Elem()
+				// }
 
 				err = f.Retrive(fd.Property.Name, fv)
 				if err != nil {
