@@ -2,6 +2,8 @@ package nuwa
 
 import (
 	"reflect"
+
+	"github.com/lsytj0413/nuwa/property"
 )
 
 // BeanFactory providing the full capabilities of SPI.
@@ -11,7 +13,7 @@ type BeanFactory interface {
 
 	AliasRegistry
 	BeanDefinitionRegistry
-	Properties
+	property.Properties
 }
 
 // NewBeanFactory return the BeanFactory impl
@@ -19,14 +21,14 @@ func NewBeanFactory() BeanFactory {
 	return &beanFactoryImpl{
 		AliasRegistry:          NewAliasRegistry(),
 		BeanDefinitionRegistry: NewBeanDefinitionRegistry(),
-		Properties:             NewProperties(),
+		Properties:             property.NewProperties(),
 	}
 }
 
 type beanFactoryImpl struct {
 	AliasRegistry
 	BeanDefinitionRegistry
-	Properties
+	property.Properties
 }
 
 func (f *beanFactoryImpl) GetBean(name string) (interface{}, error) {
@@ -48,15 +50,21 @@ func (f *beanFactoryImpl) GetBean(name string) (interface{}, error) {
 	switch typ.Kind() {
 	case reflect.Struct:
 		for _, fd := range beanDefinition.FieldDescriptors() {
-			setter, err := NewFieldValueSetter(v, fd.FieldIndex)
-			if err != nil {
-				return nil, err
-			}
-
 			if fd.Property != nil {
-				setter.Set(f.Get(fd.Property.Name))
-				// v.Elem().Field(fd.FieldIndex).Set(reflect.ValueOf(f.Get(fd.Property.Name)))
-				continue
+				fv := v.Elem().Field(fd.FieldIndex)
+
+				// If the field is ptr, first set it to the ptr to zero value
+				// Otherwise it will be cannot setable
+				// TODO: change this to Property.Retrive function
+				if fv.Kind() == reflect.Ptr {
+					fv.Set(reflect.New(v.Elem().Type().Field(fd.FieldIndex).Type.Elem()))
+					fv = fv.Elem()
+				}
+
+				err = f.Retrive(fd.Property.Name, fv)
+				if err != nil {
+					return nil, err
+				}
 			}
 		}
 	}
