@@ -5,6 +5,7 @@ import (
 
 	"github.com/lsytj0413/nuwa/property"
 	"github.com/lsytj0413/nuwa/utils"
+	"github.com/lsytj0413/nuwa/xerrors"
 )
 
 // BeanFactory providing the full capabilities of SPI.
@@ -12,6 +13,7 @@ type BeanFactory interface {
 	// GetBean return an instance, which may be shared or independent, of the specified bean.
 	GetBean(name string) (interface{}, error)
 	RetriveBean(name string, bean interface{}) error
+	RetriveBeans(beans interface{}) error
 
 	AliasRegistry
 	BeanDefinitionRegistry
@@ -101,5 +103,44 @@ func (f *beanFactoryImpl) RetriveBean(name string, bean interface{}) error {
 		}
 	}
 
+	return nil
+}
+
+func (f *beanFactoryImpl) RetriveBeans(bean interface{}) error {
+	v := reflect.ValueOf(bean)
+	if v.Kind() != reflect.Ptr {
+		return xerrors.Errorf("cannot retrive beans to '%T', it must be pointer", bean)
+	}
+	v = v.Elem()
+	if v.Kind() != reflect.Slice {
+		return xerrors.Errorf("cannot retrive beans to '%T', is must be *slice", bean)
+	}
+
+	typ := v.Type().Elem()
+	beanDefinitions := f.GetAllBeanDefinition()
+	beanNames := []string{}
+
+	for k, v := range beanDefinitions {
+		if typ.Kind() == reflect.Interface {
+			if v.Type().Implements(typ) {
+				beanNames = append(beanNames, k)
+			}
+		} else {
+			if v.Type() == typ {
+				beanNames = append(beanNames, k)
+			}
+		}
+	}
+
+	ret := reflect.MakeSlice(v.Type(), 0, 0)
+	for _, name := range beanNames {
+		b, err := f.GetBean(name)
+		if err != nil {
+			return err
+		}
+
+		ret = reflect.Append(ret, reflect.ValueOf(b))
+	}
+	v.Set(ret)
 	return nil
 }

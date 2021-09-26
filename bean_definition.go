@@ -59,10 +59,10 @@ type BeanFieldDescriptor struct {
 
 // NewBeanDefinition return the BeanDefinition impl
 func NewBeanDefinition() BeanDefinition {
-	return &beanDefinitionImpl{}
+	return &BeanDefinitionImpl{}
 }
 
-type beanDefinitionImpl struct {
+type BeanDefinitionImpl struct {
 	Typ               reflect.Type
 	name              string
 	scope             Scope
@@ -73,34 +73,34 @@ type beanDefinitionImpl struct {
 	fieldDescriptors  []FieldDescriptor
 }
 
-func (b *beanDefinitionImpl) Type() reflect.Type {
+func (b *BeanDefinitionImpl) Type() reflect.Type {
 	return b.Typ
 }
 
-func (b *beanDefinitionImpl) Name() string {
+func (b *BeanDefinitionImpl) Name() string {
 	return b.name
 }
 
-func (b *beanDefinitionImpl) Scope() Scope {
+func (b *BeanDefinitionImpl) Scope() Scope {
 	return b.scope
 }
 
-func (b *beanDefinitionImpl) ConstructorArgumentValues() []reflect.Value {
+func (b *BeanDefinitionImpl) ConstructorArgumentValues() []reflect.Value {
 	return b.consArgs
 }
 
-func (b *beanDefinitionImpl) FactoryBeanName() string {
+func (b *BeanDefinitionImpl) FactoryBeanName() string {
 	return b.factoryBeanName
 }
 
-func (b *beanDefinitionImpl) InitMethodName() string {
+func (b *BeanDefinitionImpl) InitMethodName() string {
 	return b.initMethodName
 }
 
-func (b *beanDefinitionImpl) DestroyMethodName() string {
+func (b *BeanDefinitionImpl) DestroyMethodName() string {
 	return b.destroyMethodName
 }
 
-func (b *beanDefinitionImpl) FieldDescriptors() []FieldDescriptor {
+func (b *BeanDefinitionImpl) FieldDescriptors() []FieldDescriptor {
 	return b.fieldDescriptors
 }

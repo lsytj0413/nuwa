@@ -18,6 +18,8 @@ type BeanDefinitionRegistry interface {
 	// GetBeanDefinition return the bean definition for the given bean name.
 	// It will return err if there is no such bean definition.
 	GetBeanDefinition(beanName string) (BeanDefinition, error)
+
+	GetAllBeanDefinition() map[string]BeanDefinition
 }
 
 // NewBeanDefinitionRegistry return the BeanDefinitionRegistry impl
@@ -71,4 +73,16 @@ func (r *beanDefinitionRegistryImpl) GetBeanDefinition(beanName string) (BeanDef
 	}
 
 	return beanDefinition, nil
+}
+
+func (r *beanDefinitionRegistryImpl) GetAllBeanDefinition() map[string]BeanDefinition {
+	r.lock.RLock()
+	defer r.lock.RUnlock()
+
+	ret := make(map[string]BeanDefinition, len(r.beanDefinitionMap))
+	for k, v := range r.beanDefinitionMap {
+		ret[k] = v
+	}
+
+	return ret
 }

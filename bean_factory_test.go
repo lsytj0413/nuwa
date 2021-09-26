@@ -39,7 +39,7 @@ func TestGetBean(t *testing.T) {
 				"bean2",
 			},
 			beanDefinitions: []BeanDefinition{
-				&beanDefinitionImpl{
+				&BeanDefinitionImpl{
 					Typ: reflect.TypeOf((*BeanOnlyPropertyField)(nil)),
 					fieldDescriptors: []FieldDescriptor{
 						{
@@ -87,7 +87,7 @@ func TestGetBean(t *testing.T) {
 				"bean2",
 			},
 			beanDefinitions: []BeanDefinition{
-				&beanDefinitionImpl{
+				&BeanDefinitionImpl{
 					Typ: reflect.TypeOf((*BeanOnlyBeanField)(nil)),
 					fieldDescriptors: []FieldDescriptor{
 						{
@@ -100,7 +100,7 @@ func TestGetBean(t *testing.T) {
 						},
 					},
 				},
-				&beanDefinitionImpl{
+				&BeanDefinitionImpl{
 					Typ: reflect.TypeOf((*BeanOnlyPropertyField)(nil)),
 					fieldDescriptors: []FieldDescriptor{
 						{
@@ -150,7 +150,7 @@ func TestGetBean(t *testing.T) {
 				"beanmix",
 			},
 			beanDefinitions: []BeanDefinition{
-				&beanDefinitionImpl{
+				&BeanDefinitionImpl{
 					Typ: reflect.TypeOf((*BeanOnlyPropertyField)(nil)),
 					fieldDescriptors: []FieldDescriptor{
 						{
@@ -171,7 +171,7 @@ func TestGetBean(t *testing.T) {
 						},
 					},
 				},
-				&beanDefinitionImpl{
+				&BeanDefinitionImpl{
 					Typ: reflect.TypeOf((*BeanMixField)(nil)),
 					fieldDescriptors: []FieldDescriptor{
 						{
