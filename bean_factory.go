@@ -3,7 +3,7 @@ package nuwa
 import (
 	"reflect"
 
-	"github.com/lsytj0413/nuwa/property"
+	"github.com/lsytj0413/nuwa/props"
 	"github.com/lsytj0413/nuwa/utils"
 	"github.com/lsytj0413/nuwa/xerrors"
 )
@@ -17,7 +17,7 @@ type BeanFactory interface {
 
 	AliasRegistry
 	BeanDefinitionRegistry
-	property.Properties
+	props.Properties
 }
 
 // NewBeanFactory return the BeanFactory impl
@@ -25,14 +25,14 @@ func NewBeanFactory() BeanFactory {
 	return &beanFactoryImpl{
 		AliasRegistry:          NewAliasRegistry(),
 		BeanDefinitionRegistry: NewBeanDefinitionRegistry(),
-		Properties:             property.NewProperties(),
+		Properties:             props.NewProperties(),
 	}
 }
 
 type beanFactoryImpl struct {
 	AliasRegistry
 	BeanDefinitionRegistry
-	property.Properties
+	props.Properties
 }
 
 func (f *beanFactoryImpl) GetBean(name string) (interface{}, error) {

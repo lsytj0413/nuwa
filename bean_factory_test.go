@@ -8,17 +8,17 @@ import (
 )
 
 type BeanOnlyBeanField struct {
-	B2 *BeanOnlyPropertyField
+	B2 *BeanOnlyPropertyField `nuwa:"autowire:bean2"`
 }
 
 type BeanOnlyPropertyField struct {
-	V    int
-	VPtr *int
+	V    int  `nuwa:"value:${val}"`
+	VPtr *int `nuwa:"value:${valPtr}"`
 }
 
 type BeanMixField struct {
-	B2 *BeanOnlyPropertyField
-	V  int
+	B2 *BeanOnlyPropertyField `nuwa:"autowire:bean2"`
+	V  int                    `nuwa:"value:${valPtr}"`
 }
 
 func TestGetBean(t *testing.T) {
@@ -39,27 +39,7 @@ func TestGetBean(t *testing.T) {
 				"bean2",
 			},
 			beanDefinitions: []BeanDefinition{
-				&BeanDefinitionImpl{
-					Typ: reflect.TypeOf((*BeanOnlyPropertyField)(nil)),
-					fieldDescriptors: []FieldDescriptor{
-						{
-							FieldIndex: 0,
-							Name:       "V",
-							Typ:        reflect.TypeOf(int(0)),
-							Property: &PropertyFieldDescriptor{
-								Name: "val",
-							},
-						},
-						{
-							FieldIndex: 1,
-							Name:       "VPtr",
-							Typ:        reflect.TypeOf((*int)(nil)),
-							Property: &PropertyFieldDescriptor{
-								Name: "valPtr",
-							},
-						},
-					},
-				},
+				MustNewBeanDefinition(reflect.TypeOf((*BeanOnlyPropertyField)(nil)), WithName("bean2")),
 			},
 			valNames: []string{
 				"val",
@@ -87,40 +67,8 @@ func TestGetBean(t *testing.T) {
 				"bean2",
 			},
 			beanDefinitions: []BeanDefinition{
-				&BeanDefinitionImpl{
-					Typ: reflect.TypeOf((*BeanOnlyBeanField)(nil)),
-					fieldDescriptors: []FieldDescriptor{
-						{
-							FieldIndex: 0,
-							Name:       "B2",
-							Typ:        reflect.TypeOf((*BeanOnlyPropertyField)(nil)),
-							Bean: &BeanFieldDescriptor{
-								Name: "bean2",
-							},
-						},
-					},
-				},
-				&BeanDefinitionImpl{
-					Typ: reflect.TypeOf((*BeanOnlyPropertyField)(nil)),
-					fieldDescriptors: []FieldDescriptor{
-						{
-							FieldIndex: 0,
-							Name:       "V",
-							Typ:        reflect.TypeOf(int(0)),
-							Property: &PropertyFieldDescriptor{
-								Name: "val",
-							},
-						},
-						{
-							FieldIndex: 1,
-							Name:       "VPtr",
-							Typ:        reflect.TypeOf((*int)(nil)),
-							Property: &PropertyFieldDescriptor{
-								Name: "valPtr",
-							},
-						},
-					},
-				},
+				MustNewBeanDefinition(reflect.TypeOf((*BeanOnlyBeanField)(nil)), WithName("bean1")),
+				MustNewBeanDefinition(reflect.TypeOf((*BeanOnlyPropertyField)(nil)), WithName("bean2")),
 			},
 			valNames: []string{
 				"val",
@@ -150,48 +98,8 @@ func TestGetBean(t *testing.T) {
 				"beanmix",
 			},
 			beanDefinitions: []BeanDefinition{
-				&BeanDefinitionImpl{
-					Typ: reflect.TypeOf((*BeanOnlyPropertyField)(nil)),
-					fieldDescriptors: []FieldDescriptor{
-						{
-							FieldIndex: 0,
-							Name:       "V",
-							Typ:        reflect.TypeOf(int(0)),
-							Property: &PropertyFieldDescriptor{
-								Name: "val",
-							},
-						},
-						{
-							FieldIndex: 1,
-							Name:       "VPtr",
-							Typ:        reflect.TypeOf((*int)(nil)),
-							Property: &PropertyFieldDescriptor{
-								Name: "valPtr",
-							},
-						},
-					},
-				},
-				&BeanDefinitionImpl{
-					Typ: reflect.TypeOf((*BeanMixField)(nil)),
-					fieldDescriptors: []FieldDescriptor{
-						{
-							FieldIndex: 0,
-							Name:       "B2",
-							Typ:        reflect.TypeOf((*BeanOnlyPropertyField)(nil)),
-							Bean: &BeanFieldDescriptor{
-								Name: "bean2",
-							},
-						},
-						{
-							FieldIndex: 1,
-							Name:       "VPtr",
-							Typ:        reflect.TypeOf(int(0)),
-							Property: &PropertyFieldDescriptor{
-								Name: "valPtr",
-							},
-						},
-					},
-				},
+				MustNewBeanDefinition(reflect.TypeOf((*BeanOnlyPropertyField)(nil)), WithName("bean2")),
+				MustNewBeanDefinition(reflect.TypeOf((*BeanMixField)(nil)), WithName("beanmix")),
 			},
 			valNames: []string{
 				"val",

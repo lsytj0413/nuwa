@@ -26,12 +26,8 @@ func (r *Runner2) Run(ctx context.Context) {
 func main() {
 	ap := app.NewApplication()
 
-	ap.RegisterBeanDefinition("runner1", &nuwa.BeanDefinitionImpl{
-		Typ: reflect.TypeOf((*Runner1)(nil)),
-	})
-	ap.RegisterBeanDefinition("runner2", &nuwa.BeanDefinitionImpl{
-		Typ: reflect.TypeOf((*Runner2)(nil)),
-	})
+	ap.RegisterBeanDefinition("runner1", nuwa.MustNewBeanDefinition(reflect.TypeOf((*Runner1)(nil))))
+	ap.RegisterBeanDefinition("runner2", nuwa.MustNewBeanDefinition(reflect.TypeOf((*Runner2)(nil))))
 
 	err := ap.Run()
 	if err != nil {

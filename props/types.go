@@ -1,4 +1,4 @@
-package property
+package props
 
 // Properties hold the configurable properties name & value.
 type Properties interface {
